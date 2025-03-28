@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body style="margin: 0; font-family: 'Poppins', sans-serif; background-color: #0a1931; color: #fff; text-align: center;">
+
+    <div style="max-width: 500px; margin: 30px auto; padding: 20px; background: #162447; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);">
+        <header style="display: flex; justify-content: space-between; align-items: center;">
+            <button onclick="goBack()" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">← Back</button>
+            <h1 id="currency-title" style="margin: 0; font-size: 24px;"></h1>
+        </header>
+
+        <div class="balance-section" style="margin: 20px 0;">
+            <h2 style="font-size: 18px; font-weight: 400;">Current Balance</h2>
+            <p id="balance-display" style="font-size: 22px; font-weight: bold;"></p>
+            <p id="current-value" style="font-size: 16px; color: #AAB6E6;"></p>
+        </div>
+
+        <div id="wallet-section" class="hidden" style="margin-bottom: 20px; display: none;">
+            <h3 style="font-size: 16px;">Your Wallet Address</h3>
+            <p id="wallet-address" style="font-size: 14px; background: #1b2a49; padding: 10px; border-radius: 5px; word-break: break-all;"></p>
+        </div>
+
+        <div class="actions" style="display: flex; justify-content: space-around;">
+            <button class="action-btn" onclick="openExchange()" style="padding: 12px 20px; background: #1f4068; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">Exchange</button>
+            <button class="action-btn" onclick="openBuy()" style="padding: 12px 20px; background: #1f4068; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">Buy</button>
+        </div>
+
+        <!-- Exchange Modal -->
+        <div id="exchange-modal" class="modal hidden" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1b2a49; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3); text-align: center;">
+            <h3 style="font-size: 20px;">Exchange</h3>
+            <label style="display: block; margin: 10px 0;">From: <span id="exchange-from"></span></label>
+            <input type="number" id="exchange-amount" placeholder="Enter amount" style="width: 80%; padding: 8px; margin: 10px 0; border: none; border-radius: 5px; text-align: center;">
+            
+            <label style="display: block; margin: 10px 0;">To:</label>
+            <select id="exchange-to" style="width: 80%; padding: 8px; border: none; border-radius: 5px;"></select>
+
+            <button onclick="confirmExchange()" style="margin: 10px 5px; padding: 10px; background: #21bf73; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Confirm</button>
+            <button onclick="closeModal('exchange-modal')" style="margin: 10px 5px; padding: 10px; background: #b22222; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Cancel</button>
+        </div>
+
+        <!-- Buy Modal -->
+        <div id="buy-modal" class="modal hidden" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1b2a49; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3); text-align: center;">
+            <h3 style="font-size: 20px;">Buy Currency</h3>
+            <label style="display: block; margin: 10px 0;">Buy: <span id="buy-currency"></span></label>
+
+            <label style="display: block; margin: 10px 0;">Pay With:</label>
+            <select id="pay-with" style="width: 80%; padding: 8px; border: none; border-radius: 5px;"></select>
+
+            <p id="buy-info" style="font-size: 14px; color: #AAB6E6;"></p>
+            <button onclick="confirmBuy()" style="margin: 10px 5px; padding: 10px; background: #21bf73; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Confirm</button>
+            <button onclick="closeModal('buy-modal')" style="margin: 10px 5px; padding: 10px; background: #b22222; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        function openExchange() {
+            document.getElementById("exchange-modal").style.display = "block";
+        }
+
+        function confirmExchange() {
+            alert("Exchange confirmed!");
+            closeModal('exchange-modal');
+        }
+
+        function openBuy() {
+            document.getElementById("buy-modal").style.display = "block";
+        }
+
+        function confirmBuy() {
+            alert("Purchase successful!");
+            closeModal('buy-modal');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        function goBack() {
+            window.location.href = "/";
+        }
+    </script>
+    <script src="currency.js"></script>
+</body>
+</html>
