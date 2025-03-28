@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send NGN</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0a192f;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: rgba(17, 34, 64, 0.85);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            width: 350px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .container h2 {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .balance {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #3b82f6;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        input {
+            background: #1e293b;
+            color: white;
+            outline: none;
+            border: 1px solid #334155;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+        }
+
+        button {
+            background: #1e3a8a;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #2563eb;
+        }
+
+        #message {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .back-button {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #3b82f6;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .back-button:hover {
+            color: #60a5fa;
+        }
+
+        /* Suggested Image Styling */
+        .logo {
+            width: 80px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Suggested place for an image (Logo or illustration) -->
+        <img src="https://files.catbox.moe/0qvhhl.png" alt="Crypto Logo" class="logo"> <!-- Replace with actual image -->
+
+        <!-- Display User's NGN Balance -->
+        <p class="balance">NGN Balance: <span id="ngnBalance">Loading...</span></p>
+
+        <h2>Send NGN</h2>
+        <input type="text" id="receiver" placeholder="Receiver's Username">
+        <input type="number" id="amount" placeholder="Amount to Send">
+        <button onclick="sendMoney()">Send</button>
+        <p id="message"></p>
+
+        <!-- Back Button -->
+        <a href="/" class="back-button">← Back to Home</a>
+    </div>
+
+    <script>
+        // Fetch User Balance
+        async function fetchBalance() {
+            const userId = localStorage.getItem("userId");
+            if (!userId) {
+                document.getElementById("ngnBalance").textContent = "Not logged in";
+                return;
+            }
+
+            try {
+                const response = await fetch(`/balance/${userId}`);
+                const balance = await response.json();
+                document.getElementById("ngnBalance").textContent = balance.ngn || 0;
+            } catch (error) {
+                document.getElementById("ngnBalance").textContent = "Error fetching balance";
+            }
+        }
+
+        // Send Money Function
+        async function sendMoney() {
+            const senderId = localStorage.getItem("userId");
+            const receiverId = document.getElementById("receiver").value.trim();
+            const amount = parseFloat(document.getElementById("amount").value);
+
+            if (!receiverId || isNaN(amount) || amount <= 0) {
+                document.getElementById("message").textContent = "Enter valid details!";
+                return;
+            }
+
+            try {
+                const response = await fetch("/send", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ senderId, receiverId, amount })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    document.getElementById("message").textContent = `Error: ${result.error}`;
+                } else {
+                    document.getElementById("message").textContent = "Transaction successful!";
+                    fetchBalance(); // Update balance after sending
+                }
+            } catch (error) {
+                document.getElementById("message").textContent = "Transaction failed!";
+            }
+        }
+
+        // Fetch balance on page load
+        fetchBalance();
+    </script>
+
+</body>
+</html>
