@@ -1,1 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect Telegram</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0a192f;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: rgba(17, 34, 64, 0.9);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            width: 350px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .container h2 {
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .container p {
+            font-size: 14px;
+            color: #d1d5db;
+            margin-bottom: 15px;
+        }
+
+        .container a {
+            color: #3b82f6;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .container a:hover {
+            color: #60a5fa;
+            text-decoration: underline;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #1e293b;
+            color: white;
+            outline: none;
+            border: 1px solid #334155;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #2563eb;
+        }
+
+        #status {
+            margin-top: 12px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .back-button {
+            display: block;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #3b82f6;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .back-button:hover {
+            color: #60a5fa;
+        }
+
+        .logo {
+            width: 80px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Logo -->
+        <img src="https://files.catbox.moe/4v3l99.png" alt="Crypto Logo" class="logo"> <!-- Replace with actual logo -->
+
+        <h2>Connect Telegram</h2>
+        <p>Go to <a href="https://t.me/animeclashbot" target="_blank">@animeclashbot</a> and send <b>/mycode</b>. Enter the code here.</p>
+
+        <input type="text" id="chatId" placeholder="Enter Chat ID">
+        <input type="text" id="code" placeholder="Enter Code">
+        
+        <button onclick="connectTelegram()">Connect</button>
+        <p id="status"></p>
+
+        <!-- Back Button -->
+        <a href="/" class="back-button">← Back to Home</a>
+    </div>
+
+    <script>
+        async function connectTelegram() {
+            const userId = localStorage.getItem("userId");
+            const chatId = document.getElementById("chatId").value.trim();
+            const code = document.getElementById("code").value.trim();
+            const status = document.getElementById("status");
+
+            if (!userId) {
+                alert("Please log in first!");
+                window.location.href = "/login";
+                return;
+            }
+
+            if (!chatId || !code) {
+                status.style.color = "red";
+                status.textContent = "Please enter your Chat ID and Code.";
+                return;
+            }
+
+            try {
+                const response = await fetch("/connect", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ userId, chatId, code })
+                });
+
+                const result = await response.json();
+                status.style.color = response.ok ? "green" : "red";
+                status.textContent = result.message || result.error;
+            } catch (error) {
+                status.style.color = "red";
+                status.textContent = "Connection failed!";
+            }
+        }
+    </script>
+
+</body>
+</html>
