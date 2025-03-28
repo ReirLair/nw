@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit STAKES</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0a192f;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: rgba(17, 34, 64, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            width: 360px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .container h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .icon {
+            width: 60px;
+            margin-bottom: 10px;
+        }
+
+        .info {
+            font-size: 14px;
+            color: #d1d5db;
+            margin-bottom: 10px;
+        }
+
+        .highlight {
+            color: #feca57;
+            font-weight: 600;
+        }
+
+        .chat-id {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1dd1a1;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .back-btn {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid #1e3a8a;
+            color: #1e3a8a;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .back-btn:hover {
+            background: #1e3a8a;
+            color: white;
+        }
+
+        #message {
+            margin-top: 10px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img src="https://files.catbox.moe/9dfxfk.png" class="icon" alt="Deposit Icon"> <!-- Replace with your deposit icon -->
+        <h2>Deposit STAKES</h2>
+        <p class="info">Your Linked Telegram ID: <span class="chat-id" id="chatId">Loading...</span></p>
+        <p class="info">Send <span class="highlight">/push amount</span> to <span class="highlight">@lvstakebot</span> to deposit.</p>
+        
+        <button class="btn" id="depositBtn">Claim Deposit</button>
+        <button class="back-btn" onclick="window.location.href='/'">Back to Home</button>
+
+        <p id="message"></p>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const userId = localStorage.getItem("userId");
+            if (!userId) {
+                window.location.href = "/login";
+                return;
+            }
+
+            // Fetch linked chat ID
+            try {
+                const response = await fetch("/get-linked-chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ userId })
+                });
+
+                const data = await response.json();
+                if (data.chatId) {
+                    document.getElementById("chatId").textContent = data.chatId;
+                } else {
+                    document.getElementById("chatId").textContent = "Not linked!";
+                }
+            } catch (error) {
+                console.error("Error fetching chat ID:", error);
+                document.getElementById("chatId").textContent = "Error";
+            }
+
+            // Handle deposit button click
+            document.getElementById("depositBtn").addEventListener("click", async () => {
+                try {
+                    const response = await fetch("/deposit", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ userId })
+                    });
+
+                    const data = await response.json();
+                    const messageEl = document.getElementById("message");
+
+                    if (data.error) {
+                        messageEl.textContent = data.error;
+                        messageEl.style.color = "#ff5555";
+                    } else {
+                        messageEl.textContent = data.message;
+                        messageEl.style.color = "#00ff00";
+                    }
+                } catch (error) {
+                    console.error("Deposit Error:", error);
+                    document.getElementById("message").textContent = "Failed to deposit";
+                    document.getElementById("message").style.color = "#ff5555";
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
