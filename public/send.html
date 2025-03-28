@@ -123,7 +123,7 @@
     <script>
         document.querySelectorAll("input").forEach(input => {
         input.addEventListener("keydown", function(event) {
-            if (event.key === "Enter" || event.key === "Done") {
+            if (event.key === "Enter") {
                 event.preventDefault(); // Prevent form submission
                 this.blur(); // Close keyboard
             }
