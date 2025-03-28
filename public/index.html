@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Wallet</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="wallet-container">
+        <header class="wallet-header">
+            <h1>Crypto Wallet</h1>
+        </header>
+
+        <div class="balance-box">
+            <h2>Total Balance</h2>
+            <p id="balance">$0.00</p>
+            <button id="switch-balance">Switch</button>
+        </div>
+
+        <div class="buttons">
+            <a href="/send" class="btn send">Send</a>
+            <a href="/profile" class="btn receive">Profile</a>
+            <a href="/deposit" class="btn deposit">Deposit</a>
+        </div>
+
+        <ul class="coin-list">
+            <li><a href="/stakes">
+                <img src="https://files.catbox.moe/9dfxfk.png" alt="$STAKES"> $STAKES
+            </a></li>
+            <li><a href="/animec">
+                <img src="https://files.catbox.moe/rpieba.png" alt="$ANIMEC"> $ANIMEC
+            </a></li>
+            <li><a href="/ngn">
+                <img src="https://files.catbox.moe/0qvhhl.png" alt="$NGN"> $NGN
+            </a></li>
+        </ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
