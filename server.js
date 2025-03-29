@@ -123,8 +123,8 @@ app.post("/update-rates", (req, res) => {
     res.json({ message: "Rates updated", rates });
 });
 
-/* --- AUTOMATIC BALANCE UPDATES EVERY SECOND --- */setInterval(() => {
-    setInterval(() => {
+/* --- AUTOMATIC BALANCE UPDATES EVERY SECOND --- */
+setInterval(() => {
     let users = getUsers();
 
     users.forEach(user => {
@@ -260,25 +260,24 @@ app.post("/connect", async (req, res) => {
 
     let linkedUsers = getLinkedUsers();
 
-    // **Check if chatId is already linked**
-    const isChatLinked = Object.values(linkedUsers).some(user => user.chatId === chatId);
-    if (isChatLinked) {
+    // Prevent duplicate Telegram linking
+    if (Object.values(linkedUsers).some(user => user.chatId === chatId)) {
         return res.status(400).json({ error: "This Telegram account is already linked to another user." });
     }
 
-    // **Limit 5 failed attempts per hour**
+    // Limit 5 failed attempts per hour
     if (!linkedUsers[userId]) {
         linkedUsers[userId] = { chatId: null, attempts: [], linkedAt: null };
     }
 
     let userAttempts = linkedUsers[userId].attempts || [];
-    userAttempts = userAttempts.filter(attempt => Date.now() - attempt < 3600000); // Keep only last 1 hour attempts
+    userAttempts = userAttempts.filter(attempt => Date.now() - attempt < 3600000); // Keep only last 1-hour attempts
 
     if (userAttempts.length >= 5) {
         return res.status(429).json({ error: "Too many attempts. Try again later." });
     }
 
-    // **Fetch codes from external API**
+    // Fetch codes from external API
     try {
         const response = await fetch(`https://txtorg-code.hf.space/api/get?q=${chatId}`);
         const data = await response.json();
@@ -287,7 +286,7 @@ app.post("/connect", async (req, res) => {
             return res.status(400).json({ error: "No valid code found. Try again later." });
         }
 
-        // **Check if the provided code is valid and not expired**
+        // Check if any of the requested codes match
         const now = Date.now();
         const validCode = data.codes.find(c => c.code === code && now - c.timestamp * 1000 < 5 * 60 * 1000); // 5 min expiry
 
@@ -297,7 +296,7 @@ app.post("/connect", async (req, res) => {
             return res.status(401).json({ error: "Invalid or expired code" });
         }
 
-        // **Successful linking**
+        // Successful linking
         linkedUsers[userId] = { chatId, linkedAt: now, attempts: [] };
         saveLinkedUsers(linkedUsers);
 
@@ -493,9 +492,6 @@ app.get("/deposit", (req, res) => {
 app.get(["/animec", "/ngn", "/stakes"], (req, res) => {
     res.sendFile(path.join(__dirname, "public", "currency.html"));
 });
-)};
-       );
-
 
 /* --- START SERVER --- */
 const PORT = 7860;
