@@ -493,6 +493,9 @@ app.get("/deposit", (req, res) => {
 app.get(["/animec", "/ngn", "/stakes"], (req, res) => {
     res.sendFile(path.join(__dirname, "public", "currency.html"));
 });
+)};
+       );
+
 
 /* --- START SERVER --- */
 const PORT = 7860;
