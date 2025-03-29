@@ -495,4 +495,6 @@ app.get(["/animec", "/ngn", "/stakes"], (req, res) => {
 
 /* --- START SERVER --- */
 const PORT = 7860;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
