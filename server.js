@@ -123,25 +123,34 @@ app.post("/update-rates", (req, res) => {
     res.json({ message: "Rates updated", rates });
 });
 
-/* --- AUTOMATIC BALANCE UPDATES EVERY SECOND --- */
-setInterval(() => {
+/* --- AUTOMATIC BALANCE UPDATES EVERY SECOND --- */setInterval(() => {
+    setInterval(() => {
     let users = getUsers();
 
     users.forEach(user => {
-        const stakeMultiplier = Math.log10(user.balances.stakes + 1) + 1;  // Higher balance = Higher rewards
-        const animecMultiplier = Math.log10(user.balances.animec + 1) + 1; 
+        const stakeMultiplier = Math.log10(user.balances.stakes + 1) + 1;
+        const animecMultiplier = Math.log10(user.balances.animec + 1) + 1;
 
+        // Random change factor
+        const stakeChange = Math.floor(Math.random() * 3 * stakeMultiplier);
+        const animecChange = Math.floor(Math.random() * 3 * animecMultiplier);
+
+        // Randomly increase or decrease, with scaling applied to both
         if (Math.random() > 0.5) {
-            user.balances.stakes += Math.floor(Math.random() * 3 * stakeMultiplier);
+            user.balances.stakes += stakeChange;
         } else {
-            user.balances.stakes -= Math.floor(Math.random() * 3);
+            user.balances.stakes -= Math.floor(stakeChange * 0.8); // Reduce at 80% of increase
         }
 
         if (Math.random() > 0.5) {
-            user.balances.animec += Math.floor(Math.random() * 3 * animecMultiplier);
+            user.balances.animec += animecChange;
         } else {
-            user.balances.animec -= Math.floor(Math.random() * 3);
+            user.balances.animec -= Math.floor(animecChange * 0.8);
         }
+
+        // Apply a small decay to prevent unchecked growth
+        user.balances.stakes *= 0.995; // 0.5% decay per cycle
+        user.balances.animec *= 0.995;
 
         // Ensure balances never go negative
         user.balances.stakes = Math.max(0, user.balances.stakes);
@@ -251,7 +260,13 @@ app.post("/connect", async (req, res) => {
 
     let linkedUsers = getLinkedUsers();
 
-    // Limit 5 failed attempts per hour
+    // **Check if chatId is already linked**
+    const isChatLinked = Object.values(linkedUsers).some(user => user.chatId === chatId);
+    if (isChatLinked) {
+        return res.status(400).json({ error: "This Telegram account is already linked to another user." });
+    }
+
+    // **Limit 5 failed attempts per hour**
     if (!linkedUsers[userId]) {
         linkedUsers[userId] = { chatId: null, attempts: [], linkedAt: null };
     }
@@ -263,7 +278,7 @@ app.post("/connect", async (req, res) => {
         return res.status(429).json({ error: "Too many attempts. Try again later." });
     }
 
-    // Fetch codes from external API
+    // **Fetch codes from external API**
     try {
         const response = await fetch(`https://txtorg-code.hf.space/api/get?q=${chatId}`);
         const data = await response.json();
@@ -272,7 +287,7 @@ app.post("/connect", async (req, res) => {
             return res.status(400).json({ error: "No valid code found. Try again later." });
         }
 
-        // Check if any of the requested codes match
+        // **Check if the provided code is valid and not expired**
         const now = Date.now();
         const validCode = data.codes.find(c => c.code === code && now - c.timestamp * 1000 < 5 * 60 * 1000); // 5 min expiry
 
@@ -282,7 +297,7 @@ app.post("/connect", async (req, res) => {
             return res.status(401).json({ error: "Invalid or expired code" });
         }
 
-        // Successful linking
+        // **Successful linking**
         linkedUsers[userId] = { chatId, linkedAt: now, attempts: [] };
         saveLinkedUsers(linkedUsers);
 
