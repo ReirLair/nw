@@ -128,29 +128,31 @@ setInterval(() => {
     let users = getUsers();
 
     users.forEach(user => {
-        const stakeMultiplier = Math.log10(user.balances.stakes + 1) + 1;
-        const animecMultiplier = Math.log10(user.balances.animec + 1) + 1;
+        const stakeMultiplier = Math.log10(user.balances.stakes + 1) + 1.5; // Slight boost
+        const animecMultiplier = Math.log10(user.balances.animec + 1) + 1.5;
 
-        // Random change factor
-        const stakeChange = Math.floor(Math.random() * 3 * stakeMultiplier);
-        const animecChange = Math.floor(Math.random() * 3 * animecMultiplier);
+        // Increased growth range
+        const stakeChange = Math.floor(Math.random() * 5 * stakeMultiplier);
+        const animecChange = Math.floor(Math.random() * 5 * animecMultiplier);
 
-        // Randomly increase or decrease, with scaling applied to both
-        if (Math.random() > 0.5) {
+        // Randomly increase or decrease
+        if (Math.random() > 0.4) {  // 60% chance to increase
             user.balances.stakes += stakeChange;
         } else {
-            user.balances.stakes -= Math.floor(stakeChange * 0.8); // Reduce at 80% of increase
+            user.balances.stakes -= Math.floor(stakeChange * 0.5); // Reduce loss impact
+            user.balances.stakes += 2; // Small base increase
         }
 
-        if (Math.random() > 0.5) {
+        if (Math.random() > 0.4) {
             user.balances.animec += animecChange;
         } else {
-            user.balances.animec -= Math.floor(animecChange * 0.8);
+            user.balances.animec -= Math.floor(animecChange * 0.5);
+            user.balances.animec += 2;
         }
 
-        // Apply a small decay to prevent unchecked growth
-        user.balances.stakes *= 0.995; // 0.5% decay per cycle
-        user.balances.animec *= 0.995;
+        // Lower decay
+        user.balances.stakes *= 0.999; // 0.1% decay per cycle
+        user.balances.animec *= 0.999;
 
         // Ensure balances never go negative
         user.balances.stakes = Math.max(0, user.balances.stakes);
