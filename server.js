@@ -128,31 +128,31 @@ setInterval(() => {
     let users = getUsers();
 
     users.forEach(user => {
-        const stakeMultiplier = Math.log10(user.balances.stakes + 1) + 2; // Bigger boost for higher balances
-        const animecMultiplier = Math.log10(user.balances.animec + 1) + 2;
+        const stakeMultiplier = Math.log10(user.balances.stakes + 1) ** 1.2 + 1.5; // Slower scaling at high balances
+        const animecMultiplier = Math.log10(user.balances.animec + 1) ** 1.2 + 1.5;
 
-        // Growth factor (ensures steady increase)
-        const stakeChange = Math.floor(Math.random() * 5 * stakeMultiplier) + 3;
-        const animecChange = Math.floor(Math.random() * 5 * animecMultiplier) + 3;
+        // Slower growth factor
+        const stakeChange = Math.floor(Math.random() * 3 * stakeMultiplier) + 1;
+        const animecChange = Math.floor(Math.random() * 3 * animecMultiplier) + 1;
 
         // Always increase, but allow minor down fluctuations
         user.balances.stakes += stakeChange;
-        user.balances.stakes -= Math.floor(stakeChange * 0.25); // Minor reduction to keep it interesting
+        user.balances.stakes -= Math.floor(stakeChange * 0.25); // Minor reduction
 
         user.balances.animec += animecChange;
         user.balances.animec -= Math.floor(animecChange * 0.25);
 
-        // Soft cap on extreme growth
-        user.balances.stakes *= 1.0005; // Ensures higher balances grow more
-        user.balances.animec *= 1.0005;
+        // Slower exponential growth
+        user.balances.stakes *= 1.0002; 
+        user.balances.animec *= 1.0002;
 
         // Ensure balances never go negative
-        user.balances.stakes = Math.max(1, user.balances.stakes); // Ensures balances never hit zero
+        user.balances.stakes = Math.max(1, user.balances.stakes);
         user.balances.animec = Math.max(1, user.balances.animec);
     });
 
     saveUsers(users);
-}, 1000);// Runs every 60 seconds // Runs every second
+}, 1500);// Runs every 60 seconds // Runs every second
 
 /* --- GET USER BALANCE --- */
 app.get("/balance/:userId", (req, res) => {
