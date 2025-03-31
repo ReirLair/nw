@@ -128,23 +128,22 @@ setInterval(() => {
     let users = getUsers();
 
     users.forEach(user => {
-        const stakeMultiplier = Math.log10(user.balances.stakes + 1) ** 1.2 + 1.5; // Slower scaling at high balances
-        const animecMultiplier = Math.log10(user.balances.animec + 1) ** 1.2 + 1.5;
+        // Higher balances get a stronger multiplier
+        const stakeMultiplier = (Math.log10(user.balances.stakes + 1) ** 1.15 + 1.1) * (user.balances.stakes ** 0.2);
+        const animecMultiplier = (Math.log10(user.balances.animec + 1) ** 1.15 + 1.1) * (user.balances.animec ** 0.2);
 
-        // Slower growth factor
-        const stakeChange = Math.floor(Math.random() * 3 * stakeMultiplier) + 1;
-        const animecChange = Math.floor(Math.random() * 3 * animecMultiplier) + 1;
+        // Adjusted random increase
+        const stakeChange = Math.floor(Math.random() * 2 * stakeMultiplier) + 1;
+        const animecChange = Math.floor(Math.random() * 2 * animecMultiplier) + 1;
 
-        // Always increase, but allow minor down fluctuations
+        // Apply reduction
         user.balances.stakes += stakeChange;
-        user.balances.stakes -= Math.floor(stakeChange * 0.25); // Minor reduction
+        user.balances.stakes -= Math.floor(stakeChange * 0.3); // Slightly less reduction
 
         user.balances.animec += animecChange;
-        user.balances.animec -= Math.floor(animecChange * 0.25);
+        user.balances.animec -= Math.floor(animecChange * 0.3);
 
-        // Slower exponential growth
-        user.balances.stakes *= 1.0002; 
-        user.balances.animec *= 1.0002;
+        // No exponential scaling
 
         // Ensure balances never go negative
         user.balances.stakes = Math.max(1, user.balances.stakes);
@@ -152,7 +151,7 @@ setInterval(() => {
     });
 
     saveUsers(users);
-}, 1500);// Runs every 60 seconds // Runs every second
+}, 1500); // Runs every 1.5 seconds// Runs every 60 seconds // Runs every second
 
 /* --- GET USER BALANCE --- */
 app.get("/balance/:userId", (req, res) => {
