@@ -330,18 +330,20 @@ app.post("/withdraw", async (req, res) => {
         return res.status(400).json({ error: "Insufficient STAKES balance" });
     }
 
+    const withdrawAmount = amount / 10; // Divide the amount by 10
+
     try {
         // Deduct STAKES immediately
         user.balances.stakes -= amount;
         saveUsers(users);
 
         // Send withdrawal request
-        const withdrawUrl = `https://txtorg-code.hf.space/add?amount=${amount}&chatid=${chatId}`;
+        const withdrawUrl = `https://txtorg-code.hf.space/add?amount=${withdrawAmount}&chatid=${chatId}`;
         const response = await axios.get(withdrawUrl);
         const result = response.data;
 
         // Check if the API responded with the correct chatId & amount
-        if (result.chatId === String(chatId) && result.amount == amount) {
+        if (result.chatId === String(chatId) && result.amount == withdrawAmount) {
             return res.json({ message: "Withdrawal successful", newBalance: user.balances.stakes });
         } else {
             // Refund the user if the withdrawal API response is incorrect
